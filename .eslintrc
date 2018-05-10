@@ -1,0 +1,3 @@
+{
+  "extends": ["kaisermann/typescript"]
+}

@@ -1,0 +1,66 @@
+{
+  "name": "svelte-ast-walker",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "A svelte template walker library",
+  "author": "Christian Kaisermann <christian@kaisermann.me>",
+  "repository": "https://github.com/kaisermann/svelte-preprocess",
+  "keywords": [
+    "svelte",
+    "ast",
+    "walk",
+    "markup"
+  ],
+  "engines": {
+    "node": ">= 7.6.0"
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "prebuild": "rm -rf dist/ && npm run lint",
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "jest --no-cache",
+    "test:watch": "jest --no-cache --watchAll",
+    "lint": "eslint **/*.ts",
+    "format": "prettier --loglevel silent --write \"src/**/*.js\" && eslint --fix \"src/**/*.js\"",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
+    "tag": "git tag -a v$npm_package_version -m 'Release v$npm_package_version'",
+    "release": "npm run version && npm i --package-lock-only && git add package.json package-lock.json && git commit -m \"chore: release v$npm_package_version\"",
+    "minify": "babel-minify dist -d dist",
+    "prepublishOnly": "npm run build && npm run minify && npm run release && npm run tag"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
+  },
+  "devDependencies": {
+    "@types/estree": "0.0.39",
+    "@types/jest": "^24.0.21",
+    "@types/node": "^12.12.3",
+    "babel-minify": "^0.5.1",
+    "conventional-changelog-cli": "^2.0.25",
+    "eslint": "^5.13.0",
+    "eslint-config-kaisermann": "0.0.2",
+    "estree-walker": "^0.8.1",
+    "jest": "^24.9.0",
+    "magic-string": "^0.25.3",
+    "prettier": "^1.16.4",
+    "svelte": "^3.0.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.4.5"
+  },
+  "peerDependencies": {
+    "estree-walker": "^0.8.1",
+    "magic-string": "^0.25.3",
+    "svelte": "^3.0.0"
+  }
+}

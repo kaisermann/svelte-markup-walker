@@ -1,0 +1,63 @@
+
+const groups = {} as any;
+const decorators: any = {
+  'as-button': ({ group = 'default' }: any = {}) => {
+    return {
+      role: 'button',
+      tabIndex: groups[group] != null ? ++groups[group] : (groups[group] = 0),
+      'on:keydown': (e: any) => console.log(e),
+    };
+  },
+};
+
+const template = `
+<form>
+  <div @as-button={{group:'form_1'}}> Text </div>
+  <div @as-button={{group:'form_1'}}> Text </div>
+</form>
+<form>
+  <div @as-button={{group:'form_2'}}> Text </div>
+  <div @as-button={{group:'form_2'}}> Text </div>
+</form>
+`;
+
+const process = (markup: string) => {
+  const parsed = parse(markup);
+  const s = new MagicString(markup);
+  walk(parsed.html, {
+    enter(node) {
+      if (node.attributes) {
+        const decoratorNodes = node.attributes.filter(
+          (attr: any) => attr.name.indexOf('@') === 0,
+        );
+
+        decoratorNodes.forEach((node: any) => {
+          const methodName: string = node.name.slice(1);
+          let value;
+          if (typeof node.value === 'boolean') {
+            value = node.value;
+          } else {
+            value = node.value[0];
+            if (value.type === 'Text') {
+              value = node.raw;
+            } else if (value.type === 'MustacheTag') {
+              const val = markup.slice(value.start + 1, value.end - 1);
+              value = eval(`(${val})`);
+            }
+          }
+          const newAttrs = Object.entries(decorators[methodName](value))
+            .map(
+              ([key, value]: any) =>
+                `${key}=${JSON.stringify(value.toString())}`,
+            )
+            .join(' ');
+          s.overwrite(node.start, node.end, newAttrs);
+        });
+      }
+    },
+  });
+
+  console.log(s.toString());
+};
+
+process(template);
